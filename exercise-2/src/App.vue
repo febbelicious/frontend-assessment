@@ -1,13 +1,15 @@
 <script setup>
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-import AccordionContainer from "./components/AccordionContainer.vue";
+import AccordionTabContainer from "./components/AccordionTabContainer.vue";
+import { onBeforeMount } from "vue";
+import { useStore } from "vuex";
+const store = useStore();
+const beforeCreate = onBeforeMount(() => {
+  store.commit("initializeStore");
+});
 </script>
 
 <template>
-  <div>
-    <AccordionContainer />
-  </div>
+  <AccordionTabContainer />
 </template>
 
 <style>
@@ -18,5 +20,8 @@ import AccordionContainer from "./components/AccordionContainer.vue";
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+html {
+  background-color: #e5e7eb;
 }
 </style>

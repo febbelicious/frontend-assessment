@@ -1,87 +1,80 @@
 <script setup>
-// Props from AccordionContainer.vue
 defineProps({
-  id: String,
-  content: String,
+  id: Number,
+  data: Object,
 });
 
+import { ChevronUpIcon } from "@heroicons/vue/outline";
 import { computed, onMounted } from "vue";
 import { useStore } from "vuex";
+
 const store = useStore();
-const openAccordion = computed(() => {
-  return store.state.openAccordion;
+const currentSelection = computed(() => {
+  return store.state.currentSelection;
 });
+
+const isSameSelection = (v1, v2) => {
+  return v1 === v2;
+};
+const isDataNotEmpty = () => {
+  // check if json data is empty.
+  return store.state.jsonData.length > 0 && store.state.jsonData != null;
+};
 
 // On mounted, let's open the first accordion
 const mounted = onMounted(() => {
-  if (store.state.openAccordion === "")
-    store.dispatch("saveAccordion", "Section 1"); //todo: Need to check if Section 1 exists.
+  if (store.state.currentSelection === "" && isDataNotEmpty())
+    store.dispatch("saveSelection", store.state.jsonData[0]); // first item on our jsondata.
 });
 
-function toggleAccordion(accordionId) {
-  if (isSameAccordion(openAccordion.value, accordionId)) {
+const selectionHandler = (selection) => {
+  if (isSameSelection(currentSelection.value, selection.title)) {
     // user clicked on the same accordion, let's close it then.
-    store.dispatch("saveAccordion", "");
+    store.dispatch("saveSelection", "");
   } else {
     // user clicked on a new accordion, let's set the current accordion.
-    store.dispatch("saveAccordion", accordionId);
+    store.dispatch("saveSelection", selection);
   }
-}
-
-function isSameAccordion(v1, v2) {
-  return v1 === v2;
-}
+};
 </script>
 
 
 <template>
   <div class="tab w-full overflow-hidden border-t">
+    <!-- ********************************************************************************************* -->
     <!-- Accordion Title -->
     <label
-      v-on:click="toggleAccordion(id)"
+      v-on:click="selectionHandler(data)"
       class="block p-5 leading-normal cursor-pointer text-left"
-      for="tab-single-one"
     >
       <div class="flow-root">
-        <p class="float-left font-bold"><slot /></p>
-        <p
-          :class="
-            openAccordion !== '' && openAccordion === id ? '-rotate-180' : ''
-          "
-          class="
-            transform
-            float-right
-            transition-transform
-            duration-500
-            font-extrabold
-          "
+        <p class="float-left font-bold hover:text-indigo-700"><slot /></p>
+        <p class="transform float-right transition-transform duration-500 font-extrabold"
+          :class=" currentSelection !== '' && currentSelection === data.title ? '-rotate-180' : '' "
         >
-          ^
+          <ChevronUpIcon class="h-6 w-6" aria-hidden="true" />
         </p>
       </div>
     </label>
 
+    <!-- ********************************************************************************************* -->
     <!-- Accordion Content -->
     <div
-      :class="{
-        'max-h-0': openAccordion !== id,
-        'max-h-screen': openAccordion === id,
-      }"
       class="
-        tab-content
         overflow-hidden
-        border-l-2
+        border-l-2 border-indigo-500
         bg-gray-100
-        border-indigo-500
-        leading-normal
         text-left
         relative
-        overflow-hidden
         transition-all
-        duration-700
+        duration-700 
       "
+      :class="{
+        'max-h-0': currentSelection !== data.title,
+        'max-h-screen': currentSelection === data.title,
+      }"
     >
-      <div class="p-4" v-html="content"></div>
+      <div class="p-4" v-html="data.content" />
     </div>
   </div>
 </template>

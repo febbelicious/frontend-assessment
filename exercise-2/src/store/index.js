@@ -1,18 +1,26 @@
 import { createStore } from 'vuex'
+import JsonData from '../data/data.json'
 
 const store = createStore({
   state: () => ({
-    openAccordion: '',
+    jsonData: {},
+    currentSelection: '',
+    currentSelectionDesc: '',
   }),
   getters: {},
   mutations: {
-    SET_ACCORDION(state, payload) {
-      state.openAccordion = payload
+    initializeStore(state) {
+      state.jsonData = JsonData
+    },
+    // sets the current selected tab/accordion
+    SET_SELECTION(state, payload) {
+      state.currentSelection = payload.title
+      state.currentSelectionDesc = payload.content
     },
   },
   actions: {
-    saveAccordion({ commit }, data) {
-      commit('SET_ACCORDION', data)
+    saveSelection({ commit }, data) {
+      commit('SET_SELECTION', data)
     },
   },
 })
